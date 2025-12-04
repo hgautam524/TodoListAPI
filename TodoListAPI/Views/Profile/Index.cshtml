@@ -1,0 +1,48 @@
+﻿@model IEnumerable<TodoListAPI.Models.TodoList>
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<h2>Welcome, @User.Identity?.Name!</h2>
+<h3>Your TO-DO Lists</h3>
+
+<form asp-action="CreateList" method="post" class="mb-3">
+    <input name="title" class="form-control" placeholder="Enter list title" required />
+    <button class="btn btn-primary mt-2">Create List</button>
+</form>
+
+@foreach (var list in Model)
+{
+    <div class="card mt-4">
+        <div class="card-header">@list.Title</div>
+        <div class="card-body">
+
+            <form asp-action="AddTask" method="post">
+                <input type="hidden" name="listId" value="@list.TodoListId" />
+                <div class="input-group mb-3">
+                    <input name="taskTitle" class="form-control" placeholder="New task" required />
+                    <button class="btn btn-success">Add Task</button>
+                </div>
+            </form>
+
+            <ul class="list-group">
+                @foreach (var task in list.Tasks.Where(t => !t.Status))
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        @task.Title
+                        <form asp-action="MarkDone" method="post">
+                            <input type="hidden" name="taskId" value="@task.TodoTaskId" />
+                            <button class="btn btn-outline-success btn-sm">✓ Done</button>
+                        </form>
+                    </li>
+                }
+            </ul>
+
+            @if (!list.Tasks.Any(t => !t.Status))
+            {
+                <p class="text-muted mt-2">All tasks completed ✔️</p>
+            }
+        </div>
+    </div>
+}
+
